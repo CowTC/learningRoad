@@ -1,5 +1,0 @@
-1. 利用pip install ipython 安装ipython工具
-
-2. 利用pip install notebook安装基于ipython的浏览器服务
-
-3. 安装完毕后，通过ipython notebook启动
