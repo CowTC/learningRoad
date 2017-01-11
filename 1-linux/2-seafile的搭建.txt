@@ -1,0 +1,83 @@
+Seafile的搭建
+
+1.总体上的认识，SeaFile是利用Python语言组织起来的文件服务系统;
+
+2.http://manual-cn.seafile.com/ 提供了基本的安装手册；
+	2.1 SQLite下的Seafile部署；
+	2.2 MySQL下的Seafile部署；
+
+3.需要说明的是如何在局域网搭建后，其他机器的正常访问，需要哪些工作？
+	3.1 我下载的是seafile-server-5.1.4
+	3.2 ccnet.conf的内容
+		[General]
+		USER_NAME = dwSharedFiles
+		ID = 1ac1bdf0f144e01bab6ba147baa03ee7aaa5bb0c
+		NAME = dwSharedFiles
+		SERVICE_URL = 192.168.1.246:8000---SeaFile服务器的访问地址
+		#SERVICE_URL = www.myseafile.com
+
+		[Client]
+		PORT = 13419
+
+		[Network]
+		PORT = 10001
+
+		[Database]
+		ENGINE = mysql
+		HOST = 127.0.0.1
+		PORT = 3306
+		USER = root
+		PASSWD = dw123456
+		DB = dwfiles_ccnet_db
+		CONNECTION_CHARSET = utf8
+
+	3.3 seafdav.conf-默认内容，未修改
+		[WEBDAV]
+		enabled = false
+		port = 8080
+		fastcgi = false
+		share_name = /
+
+	3.4 seafile.conf
+		[seahub]
+		port = 8000
+
+		[fileserver]
+		port = 8082---提供文件服务的端口号
+		max_upload_size=200
+		max_download_dir_size=200
+
+		[network]
+		port=22001
+
+		[database]
+		type = mysql
+		host = 127.0.0.1
+		port = 3306
+		user = root
+		password = dw123456
+		db_name = dwfiles_seafile_db
+		connection_charset = utf8
+
+	3.5 seahub_settings.py
+		SECRET_KEY = "dkcce6^#i9_sgv_@&rh)upspjc3&t7@a)a^tl9ju%p^!&qoy2g"
+
+		DATABASES = {
+	    'default':	{
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'dwfiles_seadhub_db',
+        'USER': 'root',
+        'PASSWORD': 'dw123456',
+        'HOST': '127.0.0.1',
+        'PORT': '3306'
+    				}
+		}
+		FILE_SERVER_ROOT = 'http://192.168.1.246:8082'---一定要配置---否则其他机器无法访问相关文件
+
+
+4. 一定要把服务器的端口在防火墙下放开
+	iptables命令
+	iptables -I INPUT -p tcp --dport 8000 -j ACCEPT
+	iptables -I INPUT -p tcp --dport 8082 -j ACCEPT
+
+	iptables-save查看当前防火墙状态	

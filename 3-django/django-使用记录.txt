@@ -1,0 +1,27 @@
+1.同步数据库
+	python manage.py makemigrations---第一步，预订sql语句
+	python manage.py migrate---第二步,执行sql语句
+
+2.django中js使用变量的方法
+	a)views.py
+		#广告获取
+		ad_list = Ad.objects.all()
+
+		testList=[]
+		for ad in ad_list:
+			testList.append(
+            {
+                "id":ad.index,
+                "client":ad.title,
+                "desc": ad.description,
+            })
+		testDict= json.dumps(testList)
+	
+	b)js语句
+		<script>
+		if(!window.slider) {
+			var slider={};
+		}
+		slider.data= {{testDict|safe}};
+		</script>
+	c）是否还有更好的方法，待研究

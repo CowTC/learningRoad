@@ -1,0 +1,58 @@
+1.Mysql的安装-及初始密码的设定；
+	
+	a)官方网站下载相应的安装包：
+		http://dev.mysql.com/downloads/mysql/
+
+	b）下载好后进行解压缩
+		以MySQL-5.6.32-1.linux_glibc2.5.x86_64.rpm-bundle.tar为例，解压缩后得到
+		MySQL-client-5.6.32-1.linux_glibc2.5.x86_64.rpm
+		MySQL-devel-5.6.32-1.linux_glibc2.5.x86_64.rpm
+		MySQL-embedded-5.6.32-1.linux_glibc2.5.x86_64.rpm
+		MySQL-server-5.6.32-1.linux_glibc2.5.x86_64.rpm
+		MySQL-shared-5.6.32-1.linux_glibc2.5.x86_64.rpm
+		MySQL-shared-compat-5.6.32-1.linux_glibc2.5.x86_64.rpm
+		MySQL-test-5.6.32-1.linux_glibc2.5.x86_64.rpm
+
+	c）依次安装相应的rpm包；
+
+	d）安装过程中可能会报错误：file /usr/share/mysql/charsets/README from install of MySQL-server-5.6.23-1.el6.x86_64 conflicts with file from package mariadb-libs-1:5.5.40-1.el7_0.x86_64
+		使用：
+			yum remove mysql-libs
+			卸载后重新安装
+
+	e)之后进行service mysql start的操作启动mysql;
+
+	f)此时还未设置初始密码，mysql -u root -p 会报错误：
+			mysqladmin: connect to server at 'localhost' failed
+			error: 'Access denied for user 'root'@'localhost' (using password: YES)'
+
+	g）解决方法：
+		1./etc/init.d/mysql stop
+		2.mysqld_safe --user=mysql --skip-grant-tables --skip-networking
+		3.mysql -u root -p
+		4.use mysql;
+		5.update user set password=PASSWORD("newpass")where user="root";
+		6.flush privileges; 
+		7.quit退出后进行service mysqld restart
+
+2.Mysql的使用记录
+	2.1-Mysql中文字编码问题
+		a）sql命令行进行show variables like "char%"的查看;
+			+--------------------------+----------------------------+
+			| Variable_name            | Value                      |
+			+--------------------------+----------------------------+
+			| character_set_client     | utf8                       |
+			| character_set_connection | utf8                       |
+			| character_set_database   | utf8                       |
+			| character_set_filesystem | binary                     |
+			| character_set_results    | utf8                       |
+			| character_set_server     | utf8                       |
+			| character_set_system     | utf8                       |
+			| character_sets_dir       | /usr/share/mysql/charsets/ |
+			+--------------------------+----------------------------+
+		b)修改该编码方式的配置文件位于/etc/my.cnf或者/usr/my.cnf中；
+		添加:
+			[client]
+			default-character-set=utf8
+			[mysqld]
+			character-set-server=utf8

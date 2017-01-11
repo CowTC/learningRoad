@@ -1,0 +1,80 @@
+1. 为了环境的一致，办公室和家中的电脑都安装了Centos7.0系统；
+
+2. 遇到的问题，办公室的yum可以安装基本所有的rpm软件包，但是家中的yum有些rpm软件包，说找不到相应的软件包；
+
+3. 刚开始问题没有定位，在家里配置了国内几个热点yum源，发现还是找不到相应的软件包；
+	3.1 yum源的配置
+
+		a) cd /etc/yum.repos.d
+
+		b) cp Centos-Base.repo 	Centos-Base.repo.back
+
+		c) 登陆http://mirrors.163.com/.help/centos.html
+
+		d) 下载Centos7下的repo文件
+
+		e) mv Centos7-Base-163.repo Centos-Base.repo
+
+		f) 修改Centos-Base.repo文件
+			[base]
+			name=CentOS-7 - Base - 163.com
+			mirrorlist=http://mirrors.163.com/?release=7&arch=x86_64&repo=os
+			baseurl=http://mirrors.163.com/centos/7/os/x86_64/
+			gpgcheck=1
+			gpgkey=http://mirrors.163.com/centos/RPM-GPG-KEY-CentOS-7
+
+			#released updates
+			[updates]
+			name=CentOS-7 - Updates - 163.com
+			mirrorlist=http://mirrors.163.com/?release=7&arch=x86_64&repo=updates
+			baseurl=http://mirrors.163.com/centos/7/updates/x86_64/
+			gpgcheck=1
+			gpgkey=http://mirrors.163.com/centos/RPM-GPG-KEY-CentOS-7
+
+			#additional packages that may be useful
+			[extras]
+			name=CentOS-7 - Extras - 163.com
+			mirrorlist=http://mirrors.163.com/?release=7&arch=x86_64&repo=extras
+			baseurl=http://mirrors.163.com/centos/7/extras/x86_64/
+			gpgcheck=1
+			gpgkey=http://mirrors.163.com/centos/RPM-GPG-KEY-CentOS-7
+
+			#additional packages that extend functionality of existing packages
+			[centosplus]
+			name=CentOS-7 - Plus - 163.com
+			baseurl=http://mirrors.163.com/centos/7/centosplus/x86_64/
+			gpgcheck=1
+			enabled=0
+			gpgkey=http://mirrors.163.com/centos/RPM-GPG-KEY-CentOS-7
+
+4. 查看了office中的yum源配置文件，发现还是默认的配置文件，有点糊涂了；
+
+	于是认为是网络的原因，因为office的网络可以翻墙，认为是不同的网络导致查找的默认源是不一致的，于是想查看office中的默认yum源；
+
+	测试了几个yum install的软件包，发现yum源的网站总是在变换,
+
+	[root@localhost yum.repos.d]# yum install epel-devel
+	已加载插件：fastestmirror, langpacks
+	Loading mirror speeds from cached hostfile
+	* base: mirrors.btte.net
+	* epel: ftp.yzu.edu.tw
+	* extras: mirrors.btte.net
+	* updates: mirrors.btte.net
+
+
+	[root@localhost yum.repos.d]# yum install epel-devel
+	已加载插件：fastestmirror, langpacks
+	Loading mirror speeds from cached hostfile
+	* base: mirrors.btte.net
+	* epel: ftp.cuhk.edu.hk
+	* extras: mirrors.btte.net
+	* updates: mirrors.btte.net
+
+	无意间看到了此blog
+	
+	http://blog.csdn.net/rachel_luo/article/details/8692744
+
+	提到了epel这个第三方的查看和下载rpm软件包的工具，进一步查明和验证了有效性。
+
+
+5. 相比于配置特定的yum源，这个epel的加入使得yum install的软件包更加全面，好东西阿!

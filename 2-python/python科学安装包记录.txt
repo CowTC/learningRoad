@@ -1,0 +1,33 @@
+1. pip安装
+
+    a）wget https://bootstrap.pypa.io/get-pip.py --no-check-certificate
+    b）pyhton get-pip.py
+
+2. ipython安装
+
+  2.1 直接pip install ipython
+
+  2.2 下载压缩包，解压缩
+
+3. numpy安装
+
+  3.1 pip install numpy
+
+4. pandas安装
+
+  a）安装cython
+  pip install Cython --install-option="--no-cython-compile"
+
+  b）安装pyhton-devel：头文件python.h被依赖
+  yum install python-devel
+
+  c)安装pandas
+  pip install pandas
+
+5. matplotlib安装
+  5.1 
+  a）yum install gcc gcc-c++ freetype-devel glib2-devel cairo-devel（安装freetype和png包）
+  b）pip install matplotlib
+
+6. scipy安装
+  6.1 pip install scipy

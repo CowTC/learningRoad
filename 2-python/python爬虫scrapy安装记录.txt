@@ -1,0 +1,24 @@
+1. lxml安装
+
+  1.1 直接pip install lxml
+
+2. zope.interface安装
+
+  2.1 直接pip install zope.interface
+
+3. twisted安装---python 实现的基于事件驱动的网络引擎框架；
+
+  3.1 pip install twisted
+
+
+4. pyOpenSSL安装---python的OpenSSL接口
+
+  4.1 pip install pyopenssl
+
+
+5. Scrapy安装
+  pip install scrapy
+
+
+6. 测试Scrapy是否安装可用
+  scrapy bench

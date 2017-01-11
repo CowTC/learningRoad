@@ -1,0 +1,10 @@
+1.登录-linux机（登入其他linux系统用这台机器）
+	执行ssh-keygen -t rsa
+
+2.进入该机器的/root/.ssh目录，其中的id_rsa.pub即为刚才ssh-keygen生成的公钥key
+
+3.将该文件scp至远程需要连接的机器home下的.ssh文件夹的authorized_keys,这一步u的scp还是需要密码的，这也是可以理解的。
+
+4.scp之后，注意原先的id_rsa.pub文件需要重命名为authorized_keys。
+
+5.开始无密码登录之旅。

@@ -1,0 +1,55 @@
+1）Cron服务的启动与关闭
+
+	Cron是一个linux下的定时执行工具，可以在无需人工干预的情况下运行作业。
+	由于Cron 是Linux的内置服务，但它不自动起来，可以用以下的方法启动、关闭这个服务:
+
+		a)/sbin/service crond start //启动服务
+
+		b)/sbin/service crond stop //关闭服务
+
+		c)/sbin/service crond restart //重启服务
+
+		d)/sbin/service crond reload //重新载入配置
+
+	也可以在开机启动项中加入该服务：
+		a)/sbin/service crond start
+
+2）Cron服务的用法介绍
+	
+	Cron服务是利用crontab命令来设定Cron服务的，以下是该命令的一些参数与说明：
+ 
+		a)crontab -u //设定某个用户的cron服务，一般root用户在执行这个命令的时候需要此参数
+
+		b)crontab -l //列出某个用户cron服务的详细内容
+
+		c)crontab -r //删除没个用户的cron服务
+
+		d)crontab -e //编辑某个用户的cron服务
+ 
+	比如说root查看自己的cron设置：crontab -u root -l
+
+	再例如，root想删除fred的cron设置：crontab -u fred -r
+
+	在编辑cron服务时，编辑的内容有一些格式和约定，输入：crontab -u root -e
+ 
+	进入vi编辑模式，编辑的内容一定要符合下面的格式：*/1 * * * * ls >> /tmp/ls.txt 
+
+3）Cron服务的一些例子
+	
+	a)	30 21 * * * /usr/local/etc/rc.d/lighttpd restart 表示每晚的21:30重启lighttpd
+
+	b)	45 4 1,10,22 * * /usr/local/etc/rc.d/lighttpd restart 表示每月1、10、22日的4 : 45重启lighttpd
+
+	c)	10 1 * * 6,0 /usr/local/etc/rc.d/lighttpd restart 表示每周六、周日的1 : 10重启lighttpd
+
+	d)	0,30 18-23 * * * /usr/local/etc/rc.d/lighttpd restart 表示在每天18 : 00至23 : 00之间每隔30分钟重启lighttpd
+
+	e)	0 23 * * 6 /usr/local/etc/rc.d/lighttpd restart 表示每星期六的11 : 00 pm重启lighttpd
+
+	f)	* */1 * * * /usr/local/etc/rc.d/lighttpd restart 每一小时重启lighttpd
+
+	g)	* 23-7/1 * * * /usr/local/etc/rc.d/lighttpd restart 晚上11点到早上7点之间，每隔一小时重启lighttpd
+
+	h)	0 11 4 * mon-wed /usr/local/etc/rc.d/lighttpd restart 每月的4号与每周一到周三的11点重启lighttpd
+
+	i)	0 4 1 jan * /usr/local/etc/rc.d/lighttpd restart 一月一号的4点重启lighttpd

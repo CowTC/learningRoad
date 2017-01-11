@@ -1,0 +1,26 @@
+With RHEL 7 / CentOS 7, firewalld was introduced to manage iptables. IMHO, firewalld is more suited for workstations than for server environments.
+
+将firewalld-替换为iptables
+
+1.关闭防火墙
+
+	1.1 systemctl stop firewalld
+
+	1.2 systemctl mask firewalld
+
+2. 安装iptables-services package:
+
+	2.1 yum install iptables-services
+
+	2.2 Enable the service at boot-time:
+
+		systemctl enable iptables
+
+	2.3 Managing the service
+
+		systemctl [stop|start|restart] iptables
+
+	2.4 Saving your firewall rules can be done as follows:
+		service iptables save
+		or
+		/usr/libexec/iptables/iptables.init save

@@ -1,0 +1,51 @@
+目的:
+	2016年12月份的知乎，该网站的入口是登录页面，需要帐号和验证，存在登录页面问题是不大的，因为爬虫可以模拟登录页面，但是问题在于验证码上，只有通过验证才能登录成功，该验证码的破解是需要费功夫的。
+	另外一种在此环境下进行爬虫的方法是，手动登录，之后利用登录后的cookies进行爬虫的登录，这种cookies的时间是有限制的。
+
+scrapy中使用cookies是很简单的, 只需要修改spiders中的文件即可。
+
+0. 利用firebug进行cookies的提取
+	打开zhihu.com，看是否可以自动登录，如果可以，查看firebug中的cookies提示，有很多项目:key+ value
+
+1. zhihu.py
+	# -*- coding: utf-8 -*-
+	import scrapy
+
+	class ZhihuSpider(scrapy.Spider):
+ 		name = "zhihu"
+
+		#利用cookies访问网页，start_requests是常用的入口。
+		def start_requests(self):
+			cookies={
+#				'_zap': '48d124c9-b870-428a-a869-2e003d617f3f',
+#         		'q_c1': '79df64673b04479fae3a7260488ef2db|1483406564000|1483406564000',
+#  				'l_cap_id': '"zg4M2NiMWUwZDY2ZjA5Njg=|1483406564|9f1419da21a15c2bffb65515c7df372f80d28c68"',
+#     			'cap_id': '"MTgxNjExZDk1NmFmNGI0Yzg5YmZlNWE1NGUxNDQ4OWI=|1483406564|d8d61ae9e3e2bf404264d0b8a9d3239f923f7837"',
+#				'd_c0': '"AGCClqKOGAuPTrOMWgXa5fqqBU5FI9WfpF0=|1483406564"',
+#				'r_cap_id': '"YmJkODZjNzZlYzg4NDQ0YTk2OWJkZTNlYjQ2MGUwYTU=|1483406565|586b098322076bf1852ca0f99a6313ec72fad0c1"',
+#				'login': '"MDRlYjZjNmM5YTRlNDI2YmFjN2QwZmVjMWI1NDM0MDM=|1483532992|ea1041de3b68f2af3d4eed2dd93f992f2c2cd5e3"',
+#				'_xsrf': 'bef879190d970620758367921ce380cf',
+#				'__utmt': '1',
+#				'__utma': '51854390.518085209.1482926794.1483532812.1483838176.5',
+#				'__utmb': '51854390.0.10.1483838176',
+#				'__utmc': '51854390',
+#				'__utmz': '51854390.1483532812.4.2.utmcsr=baidu|utmccn=(organic)|utmcmd=organic',
+#				'__utmv': '51854390.100-1|2=registration_date=20130902=1^3=entry_date=20130902=1',
+				'z_c0': 'Mi4wQUFBQV9ib2RBQUFBSUFJeWNtZ1JDeGNBQUFCaEFsVk53SGVVV0FEMEdKQTNtbVdUdS1waTFkazZFR1RWSjZ0REdB|1483838173|cbd79ec3c7fe897b8b1c4fd50888d4ee35e35a8c',
+        	}
+	        return [scrapy.FormRequest("https://www.zhihu.com", cookies=cookies, callback=self.parse)]
+
+		def parse(self, response):
+			print "*"* 128
+			name= response.xpath('//span[@class="name"]/text()').extract()
+			print "Our test is right:", name[0]
+			print "*"* 128 
+
+2. PS-和登录无关的说明:
+	2.1 "z_c0"起主要作用，这个key应该是登录成功返回的用户标示，只用该项就能登录；
+
+	2.2 zhihu.com需要修改setting.py中的user_agent;
+
+	2.3 zhichu.com需要修改robots协议，修改为False状态；
+
+3. 假设有多个网页存在，如何传递网页间的cookies，也需要进一步研究。
