@@ -1,0 +1,111 @@
+linux:centos 6.4
+
+ps：
+	centos 6.4中python的默认版本是2.6.6,很多软件（譬如yum）是基于2.6.6版本的python来安装的
+	所以想卸载它会带来很多的麻烦。
+	我另外安装了2.7.5版本,需要作一些改动方能正常使用
+	1)mv /usr/bin/python---还是2.6.6 /usr/bin/python2.6.6
+	2)vi /usr/bin/yum，将/usr/bin/python修改为/usr/bin/python2.6.6
+	3)ln -s /usr/local/bin/python---安装的2.7.5 /usr/bin/python---软链接2.7.5
+
+python=2.7.5
+nginx=1.9.9
+django=1.10
+uwsgi=2.0.14
+
+版本是很重要的,如果版本不对应，我也不知道会出现什么问题。
+
+django项目目录
+/home/cowtc/cowWeb
+
+1. 下载nginx安装包
+	wget  http://nginx.org/download/nginx-1.9.9.tar.gz
+	
+	1.1 解压缩 tar -zvxf 
+	1.2 ./configure
+	1.3 make
+	1.4 make install
+	1.5 make clean
+
+2.	安装uwsgi模块
+	pip install uwsgi
+
+3.	uwsgi的配置，uwsgi本身可以以多种文件形式存在（xml, ini等）
+	我采用了ini文件的配置方式：uwsgi.ini和项目manage.py一个目录，在/home/cowtc/cowWeb文件夹下。uwsgi.ini中的配置:
+
+	[uwsgi]
+	http= 127.0.0.1:8000	#直接利用uwsgi --http :8000 --module cowWeb.wsgi便可以本地访问web(127.0.0.1:8000)，网上很多教程在配置文件中没有该项，是不正确的，该项代表uwsgi以8000的端口调起web
+
+	socket= 127.0.0.1:8555 #uwsgi和nginx的通信端口
+	module= cowWeb.wsgi		#该文件不需要存在，配置文件放在当前web项目当中和manage.py一级,譬如/home/cowtc/cowWeb是本项目的根目录, uwsgi.ini也放在该目录下
+	#以下的参数都是uwsgi本身的参数，在调起web和nginx通信中并没有决定作用，只是为了web的负载以及一些配置选项
+	workers = 2           //子进程数
+	reload-mercy = 10
+	vacuum = true         //退出、重启时清理文件
+	max-requests = 1000
+	limit-as = 512
+	buffer-size = 30000
+	daemonize = /var/log/uwsgi.log
+	
+	配置完uwsgi.ini后，使用uwsgi --ini uwsgi.ini；
+	1)首先测试，127.0.0.1:8000是否能正常访问web项目；
+	2)如果可以，进入下一步nginx的配置项目；
+
+4. 收集项目静态文件
+	python manage.py collecstatic
+	
+	django=1.10的版本需要注意：
+	STATIC_ROOT= os.path.join(BASE_DIR, 'static'),就是一个字符串，不是list或者tuple
+	BASE_DIR是你项目文件的跟目录
+
+4. nginx的配置
+
+	nginx.conf中添加一个server
+	server {
+		listen       80;
+
+        server_name  www.lastingautomation.com; #注册的域名号
+		#PS:nginx中本身不带有dns解析作用，注册的域名必须解析到相应的
+			IP地址上，或者在/etc/hosts中设定
+
+        client_max_body_size 75M;
+
+		#django中的媒体文件
+        location /meida{
+                alias /root/codeForWeb/cowWeb/cowBlog/uploads/;
+        }
+
+		#django中的静态文件
+        location /static{
+                alias /root/codeForWeb/cowWeb/static/;
+        }
+
+        location / {
+			#nginx和uwsgi的通信socket
+            uwsgi_pass  127.0.0.1:8555;
+
+            include  uwsgi_params;
+            root   /root/codeForweb/cowWeb;
+            index  index.html index.htm;
+        }
+
+        error_page 404 /404.html;
+            location = /40x.html {
+        }
+
+         error_page 500 502 503 504 /50x.html;
+            location = /50x.html {
+        }
+
+    }
+	
+	nginx(开启nginx); nginx -s reload(重新读取配置文件)； nginx -s stop(停止nginx)， nginx -s restart(重启nginx服务)
+
+5.防火墙的设置
+	vi /etc/sysconfig/iptables
+	参照开放22端口，开放80端口---http和3306端口---mysql
+	service iptables restart
+
+6.按照此种配置基本是可以外网访问了
+
+7.如果还有问题，注意查看uwsgi产生的log和nginx产生的log文件；
