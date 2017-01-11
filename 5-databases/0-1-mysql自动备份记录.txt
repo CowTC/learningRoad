@@ -1,0 +1,42 @@
+主要目的：
+	想在给定的时间点进行Mysql的备份。
+
+	遇到的主要问题：
+
+		a）任务的自动执行---crontab的使用-见其他问题记录文档
+
+		b) mysqldump执行后需要输入密码，自动输入---expect的使用
+
+
+主要介绍， expect的使用：
+	#!/usr/bin/expect -f  
+	指示了该脚本要用哪个命令来运行；
+	
+	spawn db.sh  
+	spawn是进入expect环境后才可以执行的expect内部命令
+
+	expect "Enter password: "  
+	告诉expect，当什么信息出现时需要expect帮助我们完成交互；
+
+	send -- "password\n"  
+	输入密码的提示时，要发送的内容；
+
+	interact 
+	第五行的意思是保持交互，不要退出。如果没有这一句，脚本成功登录数据库后，会立即退出。
+
+
+1)mysqldump.sh
+	/usr/bin/mysqldump -u root -p dw dw_carparts_source > /home/mysql/CopyByLiuTC/dw_carparts_source.sql;
+
+2)automysqldump.sh
+
+	#!/usr/bin/expect -f
+
+	spawn /home/mysql/CopyByLiuTC/BackUp.sh
+
+	expect "Enter password: "
+
+	send -- "dw123456\n"
+
+	interact
+	#修改为expect eof在定时任务启动时，应该是最合适的---至于原因暂时没有搞清楚。
