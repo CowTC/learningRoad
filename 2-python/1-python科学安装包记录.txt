@@ -1,0 +1,31 @@
+python在科学计算方面，有着自己独特的优势。有兴趣的可以参考"利用Python进行数据分析"这本书。
+
+4个必要的模块包安装：
+
+1. numpy安装
+
+	pip install numpy
+
+2. pandas安装
+
+	a) 安装cython
+
+		pip install Cython --install-option="--no-cython-compile"
+
+	b) 安装pyhton-devel：头文件python.h被依赖
+
+		yum install python-devel
+
+	c) 安装pandas
+
+		pip install pandas
+
+3. matplotlib安装
+
+ 	a) yum install gcc gcc-c++ freetype-devel glib2-devel cairo-devel（安装freetype和png包）
+
+	b) pip install matplotlib
+
+4. scipy安装
+
+	pip install scipy

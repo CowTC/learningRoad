@@ -1,0 +1,10 @@
+python使用wkhtmltopdf
+
+1. linux安装wkhtmltopdf工具
+	yum install wkhtmltopdf-devel
+
+2. Python安装pdfkit
+	pip install pdfkit
+
+3. Python安装wkhtmltopdf
+	pip install wkhtmltopdf

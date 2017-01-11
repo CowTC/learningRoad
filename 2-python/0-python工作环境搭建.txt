@@ -1,0 +1,29 @@
+0. python版本
+	
+	在Centos-7默认的RPM包下的安装，python.version== 2.7.5
+
+1. pip安装---python第一大神器
+
+    a）wget https://bootstrap.pypa.io/get-pip.py --no-check-certificate
+
+    b）python get-pip.py
+
+	c) pip install --upgrade pip
+
+	90%以上的python第三方模块都可以借助pip来安装，前提是一些系统库已经安装好，just like: yum install python-devel
+
+2. ipython安装
+
+	pip install ipython
+
+	python解释器下的升级版。
+
+3. virtualenv安装---python第二大神器
+
+	pip install virtualenv	
+
+	建立多个python版本的模块，甚至可以搭建linux下的多版本库的管理工具,一大神器。
+
+4. notebook安装
+
+	pip install notebook
