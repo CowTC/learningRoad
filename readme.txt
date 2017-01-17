@@ -28,21 +28,12 @@
 
 	2.5-python-mysqldb学习记录.txt
 
-<<<<<<< HEAD
 	2.6-python打印网页为pdf.txt
-=======
-	2.6-pythonHtmlToPDF.txt
-
->>>>>>> 9c2c512a20b57f16475083f7a7a58e8dab793305
 
 3. django
 
 	3.0-django-使用记录.txt
-<<<<<<< HEAD
 
-=======
-	
->>>>>>> 9c2c512a20b57f16475083f7a7a58e8dab793305
 	3.1-django-form表单的问题.txt
 
 	3.2-django登录验证问题.txt
