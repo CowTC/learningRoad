@@ -1,14 +1,14 @@
 遇到的问题：
-	1）限制登录的用户输入为4-12位字符和数字的组合；
-	2）限制密码位数为6-20位，不限制字符；
+	1) 限制登录的用户输入为4-12位字符和数字的组合；
+	2) 限制密码位数为6-20位，不限制字符；
 
 ps:
 	简单的正则表达式技能;
-	a）首尾限制为4-12字母或数字：'^[a-z0-9]{4,12}$'---用户填写限制
-	b）首尾限制为6-20位任意字符：'^.{6,20}$'---密码填写限制
+	a) 首尾限制为4-12字母或数字：'^[a-z0-9]{4,12}$'---用户填写限制
+	b) 首尾限制为6-20位任意字符：'^.{6,20}$'---密码填写限制
 
 解决的方法：
-	1）使用django.core.validators中的 RegexValidtor
+	a) 使用django.core.validators中的 RegexValidtor
 
 		在app文件中新建的form.py：
 		
@@ -28,7 +28,7 @@ ps:
 								#密码限制
 								#validators=[RegexValidator(regex=r'^.{6,20}$', message='密码为6-20位任意字符（enter除外），请确认！', code='nomatch')],)
 		
-	2）利用forms中的ValidationError，可以自定义返回相应的错误信息。
+	b) 利用forms中的ValidationError，可以自定义返回相应的错误信息。
 
 		在app文件中新建的form.py：
 		

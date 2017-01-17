@@ -2,9 +2,9 @@
 
 1. 获取组件
 
-	1）在线编辑器：kindeditor-4.1.10
+	a) 在线编辑器：kindeditor-4.1.10
 
-	2）语法高亮组件：SyntaxHighlighter
+	b) 语法高亮组件：SyntaxHighlighter
 
 2. 关于Kindeditor使用方法
 
@@ -12,34 +12,29 @@
 
 3. Kindeditor中的代码编辑
 
-	1）默认位于第一排，第七个图标；
+	a) 默认位于第一排，第七个图标；
 
-	2）选择该图标，选择相应的程序语言，插入相应的代码后，在查看html代码的模式下会看到插入代码默认加了标签：
+	b) 选择该图标，选择相应的程序语言，插入相应的代码后，在查看html代码的模式下会看到插入代码默认加了标签：
 
 		<pre class="prettyprint lang-php">your code </pre>
 
-		值得特别注意的是这个<pre>中的class属性的值是非常重要的，SyntaxHighlighter要识别你插入的内容中包含的是什
-
-么语言的源代码，就是通过这个标签及它的class属性来识别。上述例子是Kindeditor默认的class，需要修改该默认的class值，从而被
-
-SyntaxHighlighter认识；
-
+		值得特别注意的是这个<pre>中的class属性的值是非常重要的，SyntaxHighlighter要识别你插入的内容中包含的是什么语言的源代码，就是通过这个标签及它的class属性来识别。上述例子是Kindeditor默认的class，需要修改该默认的class值，从而被 SyntaxHighlighter认识；
 
 4. SyntaxHighlighter相关
 
-	1）下载和解压缩得到相应的文件夹；
+	a) 下载和解压缩得到相应的文件夹；
 
-	2）文件夹中Styles和Scripts两个文件夹是最重要的；
+	b) 文件夹中Styles和Scripts两个文件夹是最重要的；
 
-		a）Styles中的CSS文件：
+		1) Styles中的CSS文件：
 
-		b）Scripts中的JS文件：
+		2) Scripts中的JS文件：
 
 5. Kindeditor和SyntaxHighlighter联用
 
-	1）我个人是将SyntaxHighlighter整个文件夹放至Django中JS的Kindeditor文件夹下；
+	a) 我个人是将SyntaxHighlighter整个文件夹放至Django中JS的Kindeditor文件夹下；
 
-	2）修改Kindeditor中的code.js（我的是在Kindeditor-all.js中），个人可以利用linux中的grep命令得到相应的文件：
+	b) 修改Kindeditor中的code.js（我的是在Kindeditor-all.js中) ，个人可以利用linux中的grep命令得到相应的文件：
 
 	将默认的pre中的class修改为SyntaxHighlighter所认识的：
 
@@ -47,8 +42,8 @@ SyntaxHighlighter认识；
 
         html='<pre class="brush:"'+ cls +'">\n'+ K.escape(code)+ '</pre>'----修改后
 
-	3）在相应输入代码的html文件中引入相应的js和css文件；
+	c) 在相应输入代码的html文件中引入相应的js和css文件；
 
-		a）引入的js文件：
+		1) 引入的js文件：
 
-		b）引入的css文件：
+		2) 引入的css文件：

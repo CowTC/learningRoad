@@ -1,9 +1,10 @@
-遇到的问题：
-（1）：想画一个Series的数组，索引为中文，值为数字，调用pandas中的plot时，中文乱码，具体表现为刻度值和标签，为方框值。
+遇到的问题一：
+想画一个Series的数组，索引为中文，值为数字，调用pandas中的plot时，中文乱码，具体表现为刻度值和标签，为方框值。
 
 解决办法一：
 	1. 指定字体解决
-		a）查询linux下的字体：
+
+		a) 查询linux下的字体：
 			#! /usr/bin/env python 
 			# -*- coding: utf-8 -*- 
 			from matplotlib.font_manager import FontManager
@@ -18,6 +19,7 @@
 			print '*' * 10, '可用的字体', '*' * 10
 			for f in available:
 				print f
+
 		输出：
 			********** 系统可用的中文字体 **********
 			文泉驿等宽正黑,文泉驛等寬正黑,WenQuanYi Zen Hei Mono
@@ -30,41 +32,52 @@
 			AR PL UMing TW
 			文泉驿等宽微米黑,文泉驛等寬微米黑,WenQuanYi Micro Hei Mono
 			********** 可用的字体 **********
-		b)查看字体对应的文件存放位置：fc-match -v "AR PL UMing CN"|grep ttc, grep ttf
 
-	2.python文件中指定字体：zhfont = mpl.font_manager.FontProperties(fname='/usr/share/fonts/cjkuni-uming/uming.ttc')
-	3.利用pandas中设定坐标轴的函数：刻度(set_xticklabels, set_yticklabels)，标签(set_xlabel, set_ylabel)中的参数fontproperties=zhfont指定
-	4.代码前面设定：
+		b) 查看字体对应的文件存放位置：fc-match -v "AR PL UMing CN"|grep ttc, grep ttf
+
+	2. python文件中指定字体：zhfont = mpl.font_manager.FontProperties(fname='/usr/share/fonts/cjkuni-uming/uming.ttc')
+
+	3. 利用pandas中设定坐标轴的函数：刻度(set_xticklabels, set_yticklabels)，标签(set_xlabel, set_ylabel)中的参数fontproperties=zhfont指定
+
+	4. 代码前面设定：
 		import sys
 		reload(sys)
 		sys.setdefaultencoding('utf8'
 
 解决办法二---待验证：
-	1.利用matplotlibrc文件来实现：
-		a）font.family: sans-serif;
+
+	1. 利用matplotlibrc文件来实现：
+
+		a) font.family: sans-serif;
+
 		b) font.sans-serif: AR PL UMing CN, Bitstream Vera Sans, Lucida Grande, Verdana, Geneva, Lucid, Arial, Helvetica, Avant Garde, sans-serif; 
+
 		c) axes.unicode_minus: False
-	2.cp /usr/share/fonts/cjkuni-uming/uming.ttc 至matplotlib中的字体库，可以使用locate进入matplotlib文件中确定该库在；
+
+	2. cp /usr/share/fonts/cjkuni-uming/uming.ttc 至matplotlib中的字体库，可以使用locate进入matplotlib文件中确定该库在；
+
 		a) ttc文件需要转换为ttf文件；
-		b）未转换之前是不可以识别的；
-	3.有效性需要确定；
 
+		b) 未转换之前是不可以识别的；
 
-（2）利用matplotlib中pie函数进行作图时，labels想利用中文来标示：
+	3. 有效性需要确定；
 
-	方法：
-	a）查看pie中的文字编码方式：
-		1）网络示例：
-		a = ax.pie(np.array(game_app["download_times"])[:5],labels=game_app["name"][:5],autopct='%1.1f%%')
-		a[1][1].get_fontname()
+遇到的问题二：
+利用matplotlib中pie函数进行作图时，labels想利用中文来标示：
+
+解决办法一：
+	1. 查看pie中的文字编码方式：
+		a) 网络示例：
+			a = ax.pie(np.array(game_app["download_times"])[:5],labels=game_app["name"][:5],autopct='%1.1f%%')
+			a[1][1].get_fontname()
 		
-		2）实际操作示例：
-		print pie[1][1].get_fontname()
+		b) 实际操作示例：
+			print pie[1][1].get_fontname()
 		
 		实际输出：
 		'Bitstream Vera Sans'
 
-	b）直接修改text属性：
+	2. 直接修改text属性：
 		for font in pie[1]:
 			font.set_fontproperties(zhfont)
 		其中：zhfont = mpl.font_manager.FontProperties(fname='/usr/share/fonts/cjkuni-uming/uming.ttc')

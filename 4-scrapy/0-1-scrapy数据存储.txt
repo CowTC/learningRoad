@@ -1,0 +1,78 @@
+scrapy抓取后的数据的存储, 存储为json文件，抓取进入Mysql数据库
+
+1. 简单和必要的处理
+
+	a) 在items.py里面定义我们要抓取的数据：
+
+		from scrapy.item import Item, Field
+		class PeopleItem(Item):
+			name = Field()
+			age = Field()
+			gender = Field()
+
+		这里我们需要获取dmoz页面上的标题, 链接, 描述, 所以定义一个对应的items结构，不像Django里面models的定义有那么多种类的Field，这里只有一种就叫Field()，再复杂就是Field可以接受一个default值。
+
+	b) spider中赋值items
+
+		利用xpath或者css选择器进行相关的赋值
+
+	c) 保存抓取得到的数据
+
+		1) scrapy提供了几个选项，可以将数据保存为json，csv或者xml文件，执行的命令：
+				scrapy crawl dmoz.org --set FEED_URI=items.json --set FEED_FORMAT=json
+
+		2) 如果需要对items数据进一步处理，比如直接保存到数据库，就要用到pipelines.py文件
+
+2. scrapy抓取数据进入Mysql
+
+	a) 版本号
+
+		1) scrapy.__version__==1.1.1
+
+		2) MySQLdb.__version__==1.2.5
+
+	b) 实施做法
+
+		抓取得到的结果是在spider中的pipelines.py中处理的，修改setting.py使得pipelines的函数生效。
+
+		1) pipelines.py
+
+		#-*- coding: utf-8 -*-
+		import MySQLdb
+
+		#编码方式用
+		import sys
+		reload(sys)
+		sys.setdefaultencoding('utf-8')
+
+		class TestPipeline(object):
+		con= None
+		def __init__(self):
+
+			#进行Mysql连接和获取连接指针
+			self.con= MySQLdb.connect(host="localhost",user="root",passwd="root123",db="airtickets",charset="utf8")
+			self.cur= self.con.cursor()
+
+		def process_item(self, item, spider):
+
+			#Insert Sql语句
+			sqlInsert= "insert into airTicCom(cname) "+ "values(' "+ item['name']+" ')"
+
+			#进行insertSql操作
+			try:
+				self.cur.execute(sqlInsert)
+			except Exception, e:
+				print "!"*128
+				print "The SQL Insert ERROR", sqlInsert
+				print "!"*128
+				self.con.rollback()
+			else:
+				self.con.commit()
+
+		def close_spider(self):
+			#关闭数据库链接
+			self.con.close()
+			self.cur.close()
+
+		2) setting.py
+			ITEM_PIPELINES字典生效。

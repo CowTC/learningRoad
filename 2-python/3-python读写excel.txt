@@ -40,7 +40,7 @@
 			 cowtcsheet.write(0, 1, label="cowtc1")
 			 cowtcsheet.write(0, 2, label="cowtc2")
 		
-		2)第m行，n列的单元格赋值
+		2) 第m行，n列的单元格赋值
 			cowtcsheet.write(m- 1, n- 1, value)	
 
 	d) 保存名为cowtcFile.xls文件

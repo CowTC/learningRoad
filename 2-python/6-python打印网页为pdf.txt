@@ -1,0 +1,47 @@
+想把一些网页教程打印为pdf格式文档，线下可以阅读。
+
+1. linux安装wkhtmltopdf工具
+	yum install wkhtmltopdf-devel
+
+2. Python安装pdfkit
+	pip install pdfkit
+
+3. Python安装wkhtmltopdf
+	pip install wkhtmltopdf
+
+4. 可以搞定网页打印为pdf：
+
+	#-*-coding:utf-8-*-
+	import logging
+	import pdfkit
+	import sys 
+	reload(sys)
+	sys.setdefaultencoding("utf8")
+
+	def downloadAndFormPDF(urlInfo, titleName, titleInfo="test.pdf"):
+		#打印核心
+    	try:
+			pdfkit.from_url(str(urlInfo), titleInfo)
+		except Exception, e:
+			print "the error is: ", e
+		#修改名称
+		os.rename(titleInfo, titleName)
+    
+	if __name__=="__main__":
+		logging.basicConfig(format='%(asctime)s: %(levelname)s: %(message)s')
+		logging.root.setLevel(level=logging.INFO)
+
+		if(len(sys.argv)!=3):
+			print "submit line parameters error, please check it"
+		sys.exit(1)
+
+		#链接地址
+		urlInfo= sys.argv[1]
+		#输出pdf文件名称
+		titleName= sys.argv[2]
+
+		print "urlInfo is: ", urlInfo
+		print "titleName is: ", titleName
+
+		#打印为pdf子函数
+		downloadAndFormPDF(urlInfo, titleName)	

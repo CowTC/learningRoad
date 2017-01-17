@@ -1,0 +1,23 @@
+1. Centos-7和Ubuntu-16.04
+
+2. 为了安装ROS-Robot Operating System，跑Google的Cartographer开源项目。
+
+	PS: ROS在Centos-7下的安装，我尝试了很多路径的安装，后来放弃了。
+
+3. 加了一块独立硬盘，U盘启动安装Ubuntu16.04系统，现在电脑两块硬盘-(Ubuntu一块，Centos一块)。
+
+4. 说一说直观感受：
+
+	4.1 现在市场上，linux内核的三大派系：ubuntu, fedrao, debian
+	
+		因为自己工作的背景历史，一开始就基于Redhat公司下免费版的Centos系统做开发，RH的服务器安全和稳定性是著名的。
+
+	4.2 Ubuntu的系统单应用上来说，确实方便。
+
+		4.2.1 ROS的安装，Cartographer的运行我在2个小时内就搞定了。Centos系统上，我花了10个小时，安装失败告终。
+
+		4.2.2 WPS，QQ，音乐播放器...Centos啥都没，网页版QQ能算么，播放器就凑合吧。
+
+		4.2.3 软件安装的对比：apt-install和yum，因为yum中rpel的支持，我没觉得在这方面有哪些差距，可能就是一些软件版本的差别。
+			
+				就搭建python开发环境来看，两者效率差不多。

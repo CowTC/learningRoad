@@ -1,82 +1,85 @@
-安装环境
-centos: 7.0
-gcc 版本 4.8.5
+0. 安装环境
+	a) Centos: 7.0
+
+	b) gcc 版本 4.8.5
 
 1. Github上下载caffe项目
 	git clone https://github.com/BVLC/caffe.git
 
 2. 安装依赖软件包
-2.1 boost
-	Boost库是一个可移植、提供源代码的C++库，作为标准库的后备，是C++标准化进程的开发引擎之一。 
-	yum install boost-devel
+	a) boost
+		Boost库是一个可移植、提供源代码的C++库，作为标准库的后备，是C++标准化进程的开发引擎之一。 
+		yum install boost-devel
 
-2.2 OpenCv
-	OpenCV是一个基于BSD许可（开源）发行的跨平台计算机视觉库。
-	yum install opecv-devel
+	b) OpenCv
+		OpenCV是一个基于BSD许可（开源）发行的跨平台计算机视觉库。
+		yum install opecv-devel
 
-2.3 Glog
-	Googleglog 库实现了应用级的日志记录，提供了C++ 风格的流操作和各种助手宏。
-	yum install glog-devel
+	c) Glog
+		Googleglog 库实现了应用级的日志记录，提供了C++ 风格的流操作和各种助手宏。
+		yum install glog-devel
 
-2.4 其他依赖库的安装
-	yum install gflags-devel protobuf-devel leveldb-devel snappy-devel hdf5-devel
+	d) 其他依赖库的安装
+		yum install gflags-devel protobuf-devel leveldb-devel snappy-devel hdf5-devel
 
-	a) gflags
-	gflags是google的一个开源的处理命令行参数的库。
+		1) gflags
+			gflags是google的一个开源的处理命令行参数的库。
 		
-	b) protobuf
-	一个数据格式的库，类似于xml。
+		2) protobuf
+			一个数据格式的库，类似于xml。
 
-	c) leveldb
-	leveldb是一个google实现的非常高效的kv数据库。
+		3) leveldb
+			leveldb是一个google实现的非常高效的kv数据库。
 
-	d) snappy
-	Snappy 是一个 C++ 的用来压缩和解压缩的开发包。
+		4) snappy
+			Snappy 是一个 C++ 的用来压缩和解压缩的开发包。
 
-	e) hdf5
-	文件系统相关的开发库。
+		5) hdf5
+			文件系统相关的开发库。
 
-2.5 BLAS安装
-	BLAS,即基础线性代数子程序库，里面拥有大量已经编写好的关于线性代数运算的程序。
-	官网上推荐使用atlas或者mkl或者OpenBlas
+	e) BLAS安装
+		BLAS,即基础线性代数子程序库，里面拥有大量已经编写好的关于线性代数运算的程序。
+		官网上推荐使用atlas或者mkl或者OpenBlas
 
-	a) atlas
-	yum install atlas-devel
-	是个坑，不推荐,如果另外利用安装linux软件的一套进行atlas的安装也会存在问题：
-	1）安装过程会报错，主要问题是由于在编译atlas源码的过程中需要关闭intel芯片即CPU的 throttling。
-	2）形成的时静态库，即使时链接到静态库的目录也存在问题。
+		1) atlas
+			yum install atlas-devel
+			是个坑，不推荐,如果另外利用安装linux软件的一套进行atlas的安装也会存在问题：
+			a) 安装过程会报错，主要问题是由于在编译atlas源码的过程中需要关闭intel芯片即CPU的 throttling。
+			b) 形成的时静态库，即使时链接到静态库的目录也存在问题。
 
-	b) mkl
-	Intel Math Kernel Library库的安装，麻烦。
-		1) 去intel官网下载mkl，申请注册免费使用，注册邮件会收到相关的序列号。
-		2) 解压缩安装
-		3) 安装
+		2) mkl
+			Intel Math Kernel Library库的安装，麻烦。
+			a) 去intel官网下载mkl，申请注册免费使用，注册邮件会收到相关的序列号。
+			b) 解压缩安装
+			c) 安装
 
-	c) OpenBLAS
-	yum install openblas-devel
+		3) OpenBLAS
+			yum install openblas-devel
 
 3. 安装	
 	进入caffe目录：
-	3.1 cp Makefile.config.example Makefile.config	
+	0. cp Makefile.config.example Makefile.config	
 		修改CPU_ONLY := 1
 		该修改表明在进行caffe安装时，只进行cpu版本的安装。
 		
 		修改BLAS := mkl,利用安装号的mkl库进行相关的安装，这个是很好的。
 
-	3.2 make all
+	1. make all
 
-	3.3 make pycaffe
+	2. make pycaffe
 		形成python可以用的工具。
 		注意修改Makefile.config中python的目录,不然numpy的头文件时找不到的。
 
-4.安装完成
+4. 安装完成
 	进入python的caffe目录,命令行测试
 	python 
 	import caffe
 	如果还有错误，应该时python的第三方模块没有安装完成，诸如：scikit-image等。
 
-5.mxnet基于mkl的安装
-	1) make文件夹下面有.mk的配置文件，修改相应的atlas为mkl
-	2) config.mk中修改USE_INTEL_PATH=/opt/intel
-	3) make当中会出错，找不到相应的动态库，但是这些动态库在mkl中都是存在的，需要我们进行相关的修改；
+5. mxnet基于mkl的安装
+	a) make文件夹下面有.mk的配置文件，修改相应的atlas为mkl
+
+	b) config.mk中修改USE_INTEL_PATH=/opt/intel
+
+	c) make当中会出错，找不到相应的动态库，但是这些动态库在mkl中都是存在的，需要我们进行相关的修改；
 		此种修改可以基于C_INCLUDE_PATH-C语言头文件或者LD_LIBRARY_PATH-C语言动态库，也可以在make中利用-I和-L来动态实现。
