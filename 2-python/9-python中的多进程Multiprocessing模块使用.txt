@@ -33,10 +33,7 @@
 
 		4) 属性 
 
-			authkey:	认证号，返回的不知道是啥...一般不用，忽略不计。
-
-			daemon:		Return whether process is a daemo-父进程终止后自动终止，且自己不能产生新进程，必须在start()之前设置;
-
+			authkey:	认证号，返回的不知道是啥...一般不用，忽略不计。 daemon:		Return whether process is a daemo-父进程终止后自动终止，且自己不能产生新进程，必须在start()之前设置; 
 			exitcode:	Return exit code of process or `None` if it has yet to stop-子进程在运行时为None、返回值为为N，表示被信号N结束;
 
 			ident:		Return identifier (PID) of process or `None` if it has yet to start-返回子进程的PID号，和pid属性一致;
@@ -53,46 +50,68 @@
 
 		3) 方法
 
-			acquire:	
+			acquire:	请求锁，当前的锁事锁定状态的时候，则lock.aquire()则会阻塞等待锁释放, 请求锁不存在，不会阻塞。
 
 			release:	释放一个Lock
 
+			Ps: 连续两个acquire，相当于在执行代码前加了一把锁，后再加一把。第二把锁需要第一把的锁解锁才会往下执行。
+
 		4) 代码分析	
 
-			import multiprocessing
-			import sys
+			#-*-coding:utf-8-*-
+			import multiprocessing as mp
 
-			def worker_with(lock, f):
+			def worker1(lock, f):
+				#此处的lock，相当于lock.acquire(), lock.release()
 				with lock:
 					fs = open(f, 'a+')
-					n = 10
-					while n > 1:
-						fs.write("Lockd acquired via with\n")
+					n = 5
+					while n >= 1:
+						fs.write("worker1\n")
 						n -= 1
 					fs.close()
         
-			def worker_no_with(lock, f):
+			def worker2(lock, f):
+				#如果由锁存在，阻塞等待锁释放
 				lock.acquire()
+
+				#lock.acquire()-第二把请求锁，进程一直阻塞。
 				try:
 					fs = open(f, 'a+')
-					n = 10
-					while n > 1:
-						fs.write("Lock acquired directly\n")
+					n = 5
+					while n >= 1:
+						fs.write("worker2\n")
 						n -= 1
 					fs.close()
 				finally:
 					lock.release()
     
 			if __name__ == "__main__":
-				lock = multiprocessing.Lock()
-				f = "file.txt"
-				w = multiprocessing.Process(target = worker_with, args=(lock, f))
-				nw = multiprocessing.Process(target = worker_no_with, args=(lock, f))
-				w.start()
-				nw.start()
-				print "end"
+				lock= mp.Lock()
+				#一般在文件IO时，添加Lock
+				f= "test.txt"
+				w1= mp.Process(target = worker1, args=(lock, f))
+				w2= mp.Process(target = worker2, args=(lock, f))
 
-			https://segmentfault.com/a/1190000008123688
+				w1.start()
+				w2.start()
+
+				w1.join()
+				w2.join()
+
+				print "Over"
+
+			#执行输出：
+				worker1                                                                                              
+				worker1
+				worker1
+				worker1
+				worker1
+				worker2
+				worker2
+				worker2
+				worker2
+				worker2
 
     c) Semaphore
 
@@ -102,70 +121,241 @@
 
 		3) 方法
 
-			acquire:
+			acquire:	如果存在Semaphore，则阻塞;
 
-			release:
+			release:	释放一个阻塞;
 
 		4) 代码分析
 
-			import multiprocessing
+			#-*-coding:utf-8-*-
+			import multiprocessing as mp
 			import time
 
 			def worker(s, i):
 				s.acquire()
-				print(multiprocessing.current_process().name + "acquire");
+				print(mp.current_process().name + "acquire");
 				time.sleep(i)
-				print(multiprocessing.current_process().name + "release\n");
+				print(mp.current_process().name + "release\n");
 				s.release()
 
 			if __name__ == "__main__":
-				s = multiprocessing.Semaphore(2)
-				for i in range(5):
-					p = multiprocessing.Process(target = worker, args=(s, i*2))
+
+				s = mp.Semaphore(3)
+				for i in range(4):
+					p = mp.Process(target= worker, args=(s, i*2))
 					p.start()
 
+			#执行输出：
+			Process-1 acquire
+			Process-1 release
+			Process-2 acquire
+			Process-4 acquire
+			Process-3 acquire
+			Process-2 release
+			Process-3 release
+			Process-4 release
+
     d) Event
-		1) 作用-用来实现进程间同步通信。
+		1) 作用-A Clone Of Threading.Event
+
+			和Threading.Event相同，用来实现进程间同步通信。
 
 		2) 参数-无
 
 		3) 方法
 
-			clear
+			clear:		清除Event-Internal Signal
 
-			is_set
+			is_set:		是否设定了Event	,设定-返回True，无设定-返回False
 
-			set
+			set:		设定Event
 
-			wait
+			wait:		Block until the internal flag is true. If the internal flag is true on entry, return immediately. Otherwise, block until another thread calls set() to set the flag to true, or until the optional timeout occurs-等待设定Event，再继续执行
+
+						参数: time_out, When the timeout argument is present and not None, it should be a floating point number specifying a timeout for the operation in seconds-wait时间，在time_ourt时间内，未接收到internal flag信号，则继续往下执行。
 
 		4) 代码分析
 
-			import multiprocessing
+			#-*-coding:utf-8-*-
+			import multiprocessing as mp
 			import time
 
 			def wait_for_event(e):
 				print("wait_for_event: starting")
+				#wait等待set internal信号.
 				e.wait()
 				print("wairt_for_event: e.is_set()->" + str(e.is_set()))
 
 			def wait_for_event_timeout(e, t):
+
 				print("wait_for_event_timeout:starting")
+
+				#如果将main函数中的set函数屏蔽，因为设定了time_out，在等待time_out时间后，继续执行，不过set的状态为False
 				e.wait(t)
 				print("wait_for_event_timeout:e.is_set->" + str(e.is_set()))
 
 			if __name__ == "__main__":
-				e = multiprocessing.Event()
-				w1 = multiprocessing.Process(name = "block", target = wait_for_event, args = (e,))
-				w2 = multiprocessing.Process(name = "non-block", target = wait_for_event_timeout, args = (e, 2))
+				e = mp.Event()
+				w1 = mp.Process(name= "block", target = wait_for_event, args = (e,))
+				w2 = mp.Process(name= "non-block", target = wait_for_event_timeout, args = (e, 2))
 				w1.start()
 				w2.start()
-				time.sleep(3)
+				time.sleep(2)
+				#Set internal signal
+				print("Main: event is set")
 				e.set()
-				print("main: event is set")
 
     e) Queue
+		1) 作用-多进程安全的队列，可以使用Queue实现多进程之间的数据传递。 
+
+		2) 参数-无
+
+		3) 方法：
+
+			cancel_join_thread: 
+
+			close
+
+			empty
+
+			full
+
+			get
+
+			get_nowait
+
+			join_thread
+
+			put:		
+
+			put_nowait:	Equivalent to put(obj, False).
+
+			qsize:		Return the approximate size of the queue. Because of multithreading/multiprocessing semantics, this number is not reliable.
+
+		4) 代码
+			
+			#-*-coding:utf-8-*-
+			import multiprocessing as mp
+			import time
+
+			def writer(q):      
+				try:         
+					q.put(1, block = False) 
+				except:         
+					pass   
+
+			def reader(q):      
+				try:         
+					print q.get(block = False) 
+				except:         
+					pass
+
+			if __name__ == "__main__":
+				q = mp.Queue()
+				writer = mp.Process(target=writer, args=(q,))  
+				writer.start()   
+
+				reader = mp.Process(target=reader, args=(q,))  
+				reader.start()  
+
+				reader.join()  
+				writer.join()
 
     f) Pipe
 
+		1) 作用- Pipe方法返回(conn1, conn2)代表一个管道的两个端。
+
+		2) 参数:
+			duplex:		如果duplex参数为True(默认值)，那么这个管道是全双工模式，也就是说conn1和conn2均可收发。duplex为False，conn1只负责接受消息，conn2只负责发送消息。
+
+		3) 方法：
+
+			count
+
+			index
+
+		4) 代码:
+
+			#-*-coding:utf-8-*-
+			import multiprocessing as mp
+			import time
+
+			def worker1(pipe):
+			    while True:
+			        for i in xrange(1000):
+			            print "1, send: %s"% i
+			            pipe.send(i)
+						time.sleep(1)
+
+			def worker2(pipe):
+				while True:
+					print "2, rev: %s"% pipe.recv()
+					time.sleep(1)
+
+			if __name__ == "__main__":
+				pipe= mp.Pipe()
+				p1= mp.Process(target=worker1, args=(pipe[0],))
+				p2= mp.Process(target=worker2, args=(pipe[1],))
+
+				p1.start()
+				p2.start()
+
+				p1.join()
+				p2.join()
+
     g) Pool
+
+		1) 作用-Pool可以提供指定数量的进程，供用户调用。
+
+			当有新的请求提交到pool中时，如果池还没有满，那么就会创建一个新的进程用来执行该请求；但如果池中的进程数已经达到规定最大值，那么该请求就会等待，直到池中有进程结束，才会创建新的进程来它。
+
+		2) 参数：
+
+			processes:		Pool池中的进程个数;
+
+			initializer=None:	
+
+			initargs=()
+
+			maxtasksperchild=None
+
+		3) 方法
+			apply(self, func, args=(), kwds={}):Equivalent of `apply()` builtin
+
+			apply_async(self, func, args=(), kwds={}, callback=None): Asynchronous equivalent of `apply()` builtin
+
+			close(self)
+			
+			imap(self, func, iterable, chunksize=1): Equivalent of `itertools.imap()` -- can be MUCH slower than `Pool.map()`
+			
+			imap_unordered(self, func, iterable, chunksize=1): Like `imap()` method but ordering of results is arbitrary
+			
+			join(self)
+			
+			map(self, func, iterable, chunksize=None): Equivalent of `map()` builtin
+			
+			map_async(self, func, iterable, chunksize=None, callback=None): Asynchronous equivalent of `map()` builtin
+			
+			terminate(self)
+
+
+		4) 代码
+			#-*-coding:utf-8-*-
+			import multiprocessing as mp
+			import time
+
+			def func(msg):
+				print "msg:", msg
+				time.sleep(3)
+				print "end"
+
+			if __name__ == "__main__":
+				pool = mp.Pool(processes = 3)
+				for i in xrange(4):
+					msg = "hello %d" %(i)
+					pool.apply_async(func, (msg, ))   #维持执行的进程总数为processes，当一个进程执行完毕后会添加新的进程进去
+
+				print "Mark~ Mark~ Mark~~~~~~~~~~~~~~~~~~~~~~"
+				pool.close()
+				pool.join()   #调用join之前，先调用close函数，否则会出错。执行完close后不会有新的进程加入到pool,join函数等待所有子进程结束
+				print "Sub-process(es) done."
