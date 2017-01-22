@@ -1,0 +1,24 @@
+0. 作用
+	通过创建独立Python开发环境的工具, 来解决依赖、版本以及间接权限问题.
+
+1. 安装
+
+	pip install virtualenv
+
+	#我安装的是版本：virtualenv-15.1.0
+
+2. 基本使用
+
+	2.1 创建一个独立的python开发环境空间
+
+		1) virtualenv virtualTest
+
+		2) virtualTest包含了lib, include, local, bin文件夹
+
+	2.2 激活创建的开发空间
+		
+		source ./bin/activate	
+
+	2.3 跳出创建的开发空间
+
+		deactivate
