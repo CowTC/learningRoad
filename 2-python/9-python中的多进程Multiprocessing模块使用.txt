@@ -212,25 +212,25 @@
 
 		3) 方法：
 
-			cancel_join_thread: 
+			cancel_join_thread: ???
 
-			close
+			close:	关闭Queue;
 
-			empty
+			empty:	是否为空; get前判断.
 
-			full
+			full:	是否满空间; put前判断.
 
-			get
+			get:	block和timeout参数，是否block，决定了timeout的有效性。block= True，timeout时间的等待后，未get则报错(Queue为空，只有空间存在东西时，方可get);
 
-			get_nowait
+			get_nowait: equivalent to get(obj, False)
 
-			join_thread
+			join_thread: ???
 
-			put:		
+			put:	block和timeout参数，是否block，决定了timeout的有效性。block= True，timeout时间的等待后，未put则报错(Queue空间满，只有空间未满时，方可put)。		
 
 			put_nowait:	Equivalent to put(obj, False).
 
-			qsize:		Return the approximate size of the queue. Because of multithreading/multiprocessing semantics, this number is not reliable.
+			qsize:	Return the approximate size of the queue. Because of multithreading/multiprocessing semantics, this number is not reliable, 可以理解为put的次数;
 
 		4) 代码
 			
@@ -240,13 +240,13 @@
 
 			def writer(q):      
 				try:         
-					q.put(1, block = False) 
+					q.put(1, block= False) 
 				except:         
 					pass   
 
 			def reader(q):      
 				try:         
-					print q.get(block = False) 
+					print q.get(block= False) 
 				except:         
 					pass
 
@@ -257,7 +257,6 @@
 
 				reader = mp.Process(target=reader, args=(q,))  
 				reader.start()  
-
 				reader.join()  
 				writer.join()
 
@@ -270,9 +269,9 @@
 
 		3) 方法：
 
-			count
+			count:   ???
 
-			index
+			index:   ???
 
 		4) 代码:
 
@@ -294,6 +293,7 @@
 
 			if __name__ == "__main__":
 				pipe= mp.Pipe()
+				#0, 1代表了管道的两端索引，0-send，1-rev
 				p1= mp.Process(target=worker1, args=(pipe[0],))
 				p2= mp.Process(target=worker2, args=(pipe[1],))
 
@@ -307,55 +307,94 @@
 
 		1) 作用-Pool可以提供指定数量的进程，供用户调用。
 
-			当有新的请求提交到pool中时，如果池还没有满，那么就会创建一个新的进程用来执行该请求；但如果池中的进程数已经达到规定最大值，那么该请求就会等待，直到池中有进程结束，才会创建新的进程来它。
+			Ps: 当有新的请求提交到pool中时，如果池还没有满，那么就会创建一个新的进程用来执行该请求；但如果池中的进程数已经达到规定最大值，那么该请求就会等待，直到池中有进程结束，才会创建新的进程来它。
 
 		2) 参数：
 
-			processes:		Pool池中的进程个数;
+			processes:			Pool池中的进程个数;
 
-			initializer=None:	
+			initializer= None:	
 
-			initargs=()
+			initargs= ()
 
-			maxtasksperchild=None
+			maxtasksperchild= None
 
 		3) 方法
-			apply(self, func, args=(), kwds={}):Equivalent of `apply()` builtin
+			apply(self, func, args=(), kwds={}):Equivalent of `apply()` builtin: 阻塞调用Pool池，两层意义：主进程和子进程会阻塞；进程池中的子进程中也会阻塞；
 
-			apply_async(self, func, args=(), kwds={}, callback=None): Asynchronous equivalent of `apply()` builtin
+			apply_async(self, func, args=(), kwds={}, callback=None): Asynchronous equivalent of `apply()` builtin:		非阻塞调用Pool池。可以理解为真正的并行化。
 
-			close(self)
+			close(self):	关闭pool，使其不在接受新的任务。
 			
-			imap(self, func, iterable, chunksize=1): Equivalent of `itertools.imap()` -- can be MUCH slower than `Pool.map()`
+			map(self, func, iterable, chunksize=1): Equivalent of `itertools.imap()` -- can be MUCH slower than `Pool.map()`: ???类似于MPI中的主从模式吗？？？
 			
-			imap_unordered(self, func, iterable, chunksize=1): Like `imap()` method but ordering of results is arbitrary
+			map_unordered(self, func, iterable, chunksize=1): Like `imap()` method but ordering of results is arbitrary
 			
-			join(self)
+			join(self):		同步各个进程；
 			
-			map(self, func, iterable, chunksize=None): Equivalent of `map()` builtin
+			imap(self, func, iterable, chunksize=None): Equivalent of `map()` builtin:	???
 			
-			map_async(self, func, iterable, chunksize=None, callback=None): Asynchronous equivalent of `map()` builtin
+			imap_async(self, func, iterable, chunksize=None, callback=None): Asynchronous equivalent of `map()` builtin:	???
 			
-			terminate(self)
+			terminate(self):	终止进程池
 
 
 		4) 代码
+
 			#-*-coding:utf-8-*-
 			import multiprocessing as mp
 			import time
 
 			def func(msg):
 				print "msg:", msg
-				time.sleep(3)
+				time.sleep(2)
 				print "end"
 
 			if __name__ == "__main__":
-				pool = mp.Pool(processes = 3)
+				#创建一个进程池, 池中有三个进程
+				pool = mp.Pool(processes= 3)
+
 				for i in xrange(4):
 					msg = "hello %d" %(i)
+					#非阻塞的调用: 主进程和子进程无关，各自执行。
 					pool.apply_async(func, (msg, ))   #维持执行的进程总数为processes，当一个进程执行完毕后会添加新的进程进去
-
-				print "Mark~ Mark~ Mark~~~~~~~~~~~~~~~~~~~~~~"
+					#阻塞的调用: 主进程和子进程相关，Pool池执行完(Pool池中的进程也遵循阻塞)，主进程继续。
+					#pool.apply(func, (msg, ))   #维持执行的进程总数为processes，当一个进程执行完毕后会添加新的进程进去
+				
+				print "~~~Main, Hello1~~~"
 				pool.close()
-				pool.join()   #调用join之前，先调用close函数，否则会出错。执行完close后不会有新的进程加入到pool,join函数等待所有子进程结束
-				print "Sub-process(es) done."
+				print "~~~Main, Hello2~~~"
+				pool.join()   #调用join之前，先调用close函数，否则会出错。执行完close后不会有新的进程加入到pool，join函数等待所有子进程结束。
+				print "All-Process(es) Done."
+
+			#非阻塞输出
+			~~~Main, Hello1~~~
+			msg:  hello 0
+			~~~Main, Hello2~~~
+			msg:  hello 1
+			msg:  hello 2
+			end:  hello 0
+			msg:  hello 3
+			end:  hello 1
+			end:  hello 2
+			end:  hello 3
+			All-process(es) done.
+			#1. 非阻塞的方式，主进程会自己直行至join
+			#2. 最大Pool池为3，只有一个完成后，才会执行第4个。 
+
+			#阻塞输出
+			msg:  hello 0
+			end:  hello 0
+			msg:  hello 1
+			end:  hello 1
+			msg:  hello 2
+			end:  hello 2
+			msg:  hello 3
+			end:  hello 3
+			~~~Main, Hello1~~~
+			~~~Main, Hello2~~~
+			All-process(es) done.
+			#1. 阻塞的方式，主进程等待Pool池的任务结束后执行;
+			#2. Pool池中也遵循阻塞方式，挨个执行。 
+
+			
