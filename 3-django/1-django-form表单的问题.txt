@@ -1,3 +1,79 @@
-1. id，class样式的问题
+Django中使用form，需要注意哪些方面的内容。
 
-2. form中选项的意义
+1. form的定义-form.py
+
+	# -*- coding:utf-8 -*-
+	from django import forms
+	from django.conf import settings
+	from django.db.models import Q
+	from models import User
+	import re
+
+	def validate_user(value):
+		reg = re.compile(r'^[a-z0-9]{4,20}$')
+		if str(reg.match(value))=="None":
+			#用户名填写错误提示
+			raise forms.ValidationError(u'%s 账户，密码为4-20位字母或数字组成，请确认！' % value)
+
+	def validate_pwd(value):
+		reg = re.compile(r'^.{4,20}$')
+		if str(reg.match(value))=="None":
+			#密码填写错误提示
+			raise forms.ValidationError(u'%s 密码为4-20位非enter字符，请确认！' % value)
+
+	#用户登录的表单，用户+密码
+	#	1) 继承forms.Form对象;
+	#	2) forms.CharField有很参数，定义了表单的内容,格式和约束;
+	#	3) 也可以用validators来改写某种格式和约束;
+
+	class LoginForm(forms.Form):
+		''' 
+			登录Form
+		'''
+		username = forms.CharField(
+                                widget=forms.TextInput(attrs={"class":"username", "placeholder": "用户：4-20位字母或组合", "required": "required",}),
+                                error_messages={"required": "username不能为空",},
+                                validators=[validate_user],)
+
+		password = forms.CharField(
+                                widget=forms.PasswordInput(attrs={"class": "password", "placeholder": "密码：4-20位非enter字符组合", "required": "required",}),
+                                error_messages={"required": "password不能为空",},
+                                validators=[validate_pwd],)
+
+2. html的写法-login.html
+
+	#非html注释-post数据格式，注意加上csrf_token验证
+    <form method="POST">
+        <h2 style="font-size: 30px">请登录:</h2>
+        {% csrf_token %}
+        {{login_form.username}}
+        <br>
+        {{login_form.password}}
+        <br>
+        <input id="submit" type="submit" value="Login" >
+    </form>
+
+
+3. views响应函数-views.py
+
+	#处理post响应,传递用户数据
+    try:
+        if request.method == 'POST':
+            login_form = LoginForm(request.POST)
+            if login_form.is_valid():
+                # 登录
+                username = login_form.cleaned_data["username"]
+                password = login_form.cleaned_data["password"]
+                user = authenticate(username=username, password=password)
+                if user is not None:
+                    user.backend = 'django.contrib.auth.backends.ModelBackend' # 指定默认的登录验证方式
+                    login(request, user)
+                else:
+                    return render(request, 'failure.html', {'reason': '登录验证失败'})
+                return redirect('/')
+            else:
+                return render(request, 'failure.html', {'reason': login_form.errors})
+        else:
+            login_form = LoginForm()
+    except Exception as e:
+        logger.error(e)
