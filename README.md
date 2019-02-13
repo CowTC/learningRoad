@@ -1,6 +1,6 @@
 ## linux
 	
-	1.0-centosU盘安装记录.txt
+	[1.0-centosU盘安装记录.md](https://github.com/CowTC/learningRoad/blob/master/1-linux/0-centosU%E7%9B%98%E5%AE%89%E8%A3%85%E8%AE%B0%E5%BD%95.md)
 
 	1.1-ssh免登陆密码.txt
 	
