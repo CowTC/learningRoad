@@ -1,4 +1,4 @@
-1. linux
+## linux
 	
 	1.0-centosU盘安装记录.txt
 
@@ -14,7 +14,7 @@
 	
 	1.6-Ubuntu16.04-使用体会.txt
 
-2. python
+## python
 
 	2.0-python工作环境搭建.txt
 
@@ -30,7 +30,7 @@
 
 	2.6-python打印网页为pdf.txt
 
-3. django
+## django
 
 	3.0-django-使用记录.txt
 
@@ -42,7 +42,7 @@
 
 	3.4-django+uwgi+nginx部署网站.txt
 
-4. scrapy
+## scrapy
 		
 	4.0-scrapy动态网站.txt
 
@@ -80,7 +80,7 @@
 		4.4-0-scrapy中设定代理IP.txt
 		4.4-1-scrapy中维护代理IP池.txt
 
-5. databases
+## databases
 	
 	5.0 Mysql
 		5.0-0-mysql安装以及初始密码设定问题.txt
@@ -102,17 +102,17 @@
 
 	5.2-0-mongodb安装记录.txt
 
-6. machine learning
+## machine learning
 	6.0-caffe的cpu版本安装.txt
 
 	6.0-python机器学习库介绍.txt
 
-7. HPC
+## HPC
 	7.0-SU安装记录.txt
 
-8. Mapreduce
+## shell
 
-9. regular expression
+## regular expression
 
-10. others
+## others
 	10.0-显示器连接问题.txt
